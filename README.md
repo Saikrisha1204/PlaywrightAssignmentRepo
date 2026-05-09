@@ -6,13 +6,14 @@ End-to-end UI tests built with Playwright and JavaScript, covering four scenario
 
 ## Project Structure
 
-playwright-assignment/
 - tests/login.spec.js — Login flow (valid + invalid)
 - tests/checkbox.spec.js — Checkbox toggling
 - tests/dropdown.spec.js — Dropdown selection
 - tests/dynamic-loading.spec.js — Dynamic content loading
 - playwright.config.js — Browsers, timeouts, reporters
 - package.json
+- package-lock.json
+- .gitignore
 - README.md
 
 ---
@@ -23,8 +24,6 @@ playwright-assignment/
 - Windows 10/11, macOS 12+, or Linux (Ubuntu 20.04+)
 
 Verify your Node install: **node --version**
-
-A **.nvmrc** file is included in the repo pinning the tested Node version. If you use nvm, run **nvm install** the first time to install the pinned version, then **nvm use** on subsequent runs to switch to it automatically.
 
 ---
 

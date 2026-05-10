@@ -1,10 +1,8 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 import dotenv from 'dotenv';
+import { LoginPage } from '../pages/LoginPage.js';
 
 dotenv.config();
-
-const LOGIN_URL = '/login';
-const SECURE_URL_PATTERN = /.*\/secure$/;
 
 const VALID_CREDENTIALS = {
   username: process.env.TEST_USERNAME,
@@ -16,50 +14,36 @@ const INVALID_CREDENTIALS = {
   password: 'WrongPassword',
 };
 
-const MESSAGES = {
-  loginSuccess: 'You logged into a secure area!',
-  logoutSuccess: 'You logged out of the secure area!',
-  invalidUsername: 'Your username is invalid!',
-};
-
 test.describe('Login Functionality', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(LOGIN_URL);
-    await expect(page.getByRole('heading', { name: 'Login Page' })).toBeVisible();
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
   });
 
   test('should login successfully with valid credentials', async ({ page }) => {
-    await page.getByRole('textbox', { name: 'Username' }).fill(VALID_CREDENTIALS.username);
-    await page.getByRole('textbox', { name: 'Password' }).fill(VALID_CREDENTIALS.password);
-    await page.getByRole('button', { name: /Login/ }).click();
+    const loginPage = new LoginPage(page);
 
-    await expect(page).toHaveURL(SECURE_URL_PATTERN);
-    await expect(page.locator('#flash')).toContainText(MESSAGES.loginSuccess);
-    await expect(page.getByRole('link', { name: /Logout/ })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Secure Area', exact: true })).toBeVisible();
+    await loginPage.login(VALID_CREDENTIALS.username, VALID_CREDENTIALS.password);
+
+    await loginPage.expectLoginSuccess();
   });
 
   test('should show error message with invalid credentials', async ({ page }) => {
-    await page.getByRole('textbox', { name: 'Username' }).fill(INVALID_CREDENTIALS.username);
-    await page.getByRole('textbox', { name: 'Password' }).fill(INVALID_CREDENTIALS.password);
-    await page.getByRole('button', { name: /Login/ }).click();
+    const loginPage = new LoginPage(page);
 
-    await expect(page.locator('#flash')).toContainText(MESSAGES.invalidUsername);
-    await expect(page).toHaveURL(LOGIN_URL);
-    await expect(page.getByRole('link', { name: /Logout/ })).toBeHidden();
+    await loginPage.login(INVALID_CREDENTIALS.username, INVALID_CREDENTIALS.password);
+
+    await loginPage.expectLoginError();
   });
 
   test('should logout successfully after a valid login', async ({ page }) => {
-    await page.getByRole('textbox', { name: 'Username' }).fill(VALID_CREDENTIALS.username);
-    await page.getByRole('textbox', { name: 'Password' }).fill(VALID_CREDENTIALS.password);
-    await page.getByRole('button', { name: /Login/ }).click();
+    const loginPage = new LoginPage(page);
 
-    await expect(page).toHaveURL(SECURE_URL_PATTERN);
+    await loginPage.login(VALID_CREDENTIALS.username, VALID_CREDENTIALS.password);
+    await loginPage.expectLoginSuccess();
 
-    await page.getByRole('link', { name: /Logout/ }).click();
+    await loginPage.logout();
 
-    await expect(page).toHaveURL(LOGIN_URL);
-    await expect(page.locator('#flash')).toContainText(MESSAGES.logoutSuccess);
-    await expect(page.getByRole('link', { name: /Logout/ })).toBeHidden();
+    await loginPage.expectLogoutSuccess();
   });
 });

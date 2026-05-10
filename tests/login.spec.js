@@ -1,11 +1,14 @@
-const { test, expect } = require('@playwright/test');
+import { test, expect } from '@playwright/test';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const LOGIN_URL = '/login';
 const SECURE_URL_PATTERN = /.*\/secure$/;
 
 const VALID_CREDENTIALS = {
-  username: 'tomsmith',
-  password: 'SuperSecretPassword!',
+  username: process.env.TEST_USERNAME,
+  password: process.env.TEST_PASSWORD,
 };
 
 const INVALID_CREDENTIALS = {

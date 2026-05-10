@@ -1,4 +1,4 @@
-const { test, expect } = require('@playwright/test');
+import { test, expect } from '@playwright/test';
 const DYNAMIC_LOADING_PATH  = '/dynamic_loading';
 
 test.describe('Dynamic Loading', () => {

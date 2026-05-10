@@ -23,7 +23,6 @@ const MESSAGES = {
 };
 
 test.describe('Login Functionality', () => {
-
   test.beforeEach(async ({ page }) => {
     await page.goto(LOGIN_URL);
     await expect(page.getByRole('heading', { name: 'Login Page' })).toBeVisible();
@@ -37,8 +36,7 @@ test.describe('Login Functionality', () => {
     await expect(page).toHaveURL(SECURE_URL_PATTERN);
     await expect(page.locator('#flash')).toContainText(MESSAGES.loginSuccess);
     await expect(page.getByRole('link', { name: /Logout/ })).toBeVisible();
-        await expect(page.getByRole('heading', { name: 'Secure Area', exact: true })).toBeVisible()
-
+    await expect(page.getByRole('heading', { name: 'Secure Area', exact: true })).toBeVisible();
   });
 
   test('should show error message with invalid credentials', async ({ page }) => {
@@ -64,5 +62,4 @@ test.describe('Login Functionality', () => {
     await expect(page.locator('#flash')).toContainText(MESSAGES.logoutSuccess);
     await expect(page.getByRole('link', { name: /Logout/ })).toBeHidden();
   });
-
 });

@@ -8,7 +8,6 @@ const OPTIONS = {
 };
 
 test.describe('Dropdown Functionality', () => {
-
   test.beforeEach(async ({ page }) => {
     await page.goto(DROPDOWN_URL);
     await expect(page.getByRole('heading', { name: 'Dropdown List' })).toBeVisible();
@@ -36,5 +35,4 @@ test.describe('Dropdown Functionality', () => {
     await expect(dropdown).toHaveValue(OPTIONS.option2.value);
     await expect(dropdown.locator('option:checked')).toHaveText(OPTIONS.option2.label);
   });
-
 });

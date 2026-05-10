@@ -36,6 +36,7 @@ Step 1. Open a new folder in VS Code or your editor of choice.
 Step 2. Initialise Playwright: **npm init playwright@latest**
 
 Step 3. The following files will be created:
+
 - **package.json** — Node project management file
 - **playwright.config.js** — Playwright configuration file
 - **tests/** — basic example test

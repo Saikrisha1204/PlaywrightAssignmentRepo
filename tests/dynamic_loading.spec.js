@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const BASE_URL = 'https://the-internet.herokuapp.com/dynamic_loading';
+const DYNAMIC_LOADING_PATH  = '/dynamic_loading';
 
 test.describe('Dynamic Loading', () => {
 
@@ -8,7 +8,7 @@ test.describe('Dynamic Loading', () => {
    * Playwright waits for it to become visible after the loader disappears.
    */
   test('Example 1 - Hidden element becomes visible after loading', async ({ page }) => {
-    await page.goto(`${BASE_URL}/1`);
+    await page.goto(`${DYNAMIC_LOADING_PATH }/1`);
 
     const startButton = page.getByRole('button', { name: 'Start' });
     await expect(startButton).toBeVisible();
@@ -26,7 +26,7 @@ test.describe('Dynamic Loading', () => {
    * JavaScript renders and injects it after loading completes.
    */
   test('Example 2 - Element rendered into DOM after loading', async ({ page }) => {
-    await page.goto(`${BASE_URL}/2`);
+    await page.goto(`${DYNAMIC_LOADING_PATH }/2`);
 
     const startButton = page.getByRole('button', { name: 'Start' });
     await expect(startButton).toBeVisible();

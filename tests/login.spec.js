@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
 
-const LOGIN_URL = 'https://the-internet.herokuapp.com/login';
+const LOGIN_URL = '/login';
 const SECURE_URL_PATTERN = /.*\/secure$/;
 
 const VALID_CREDENTIALS = {

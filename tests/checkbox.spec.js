@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
 
-const CHECKBOX_URL = 'https://the-internet.herokuapp.com/checkboxes';
+const CHECKBOX_URL = '/checkboxes';
 
 test.describe('Checkbox Functionality', () => {
 

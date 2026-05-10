@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
 
-const DROPDOWN_URL = 'https://the-internet.herokuapp.com/dropdown';
+const DROPDOWN_URL = '/dropdown';
 
 const OPTIONS = {
   option1: { value: '1', label: 'Option 1' },

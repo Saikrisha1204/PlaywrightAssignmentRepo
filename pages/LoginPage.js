@@ -13,10 +13,8 @@ export class LoginPage {
     this.page = page;
   }
 
-  // ============================================================
+  
   // LOCATORS — Defined once, used everywhere
-  // ============================================================
-
   get pageHeading() {
     return this.page.getByRole('heading', { name: 'Login Page' });
   }
@@ -45,10 +43,8 @@ export class LoginPage {
     return this.page.getByRole('heading', { name: 'Secure Area', exact: true });
   }
 
-  // ============================================================
+  
   // ACTIONS — User behaviors
-  // ============================================================
-
   async goto() {
     await this.page.goto('/login');
     await expect(this.pageHeading).toBeVisible();
@@ -64,10 +60,8 @@ export class LoginPage {
     await this.logoutLink.click();
   }
 
-  // ============================================================
-  // ASSERTIONS — Page-specific verifications
-  // ============================================================
 
+  // ASSERTIONS — Page-specific verifications
   async expectLoginSuccess() {
     await expect(this.page).toHaveURL(SECURE_URL_PATTERN);
     await expect(this.flashMessage).toContainText(MESSAGES.loginSuccess);

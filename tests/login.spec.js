@@ -15,35 +15,27 @@ const INVALID_CREDENTIALS = {
 };
 
 test.describe('Login Functionality', () => {
+  let loginPage;
+
   test.beforeEach(async ({ page }) => {
-    const loginPage = new LoginPage(page);
+    loginPage = new LoginPage(page);
     await loginPage.goto();
   });
 
-  test('should login successfully with valid credentials', async ({ page }) => {
-    const loginPage = new LoginPage(page);
-
+  test('should login successfully with valid credentials', async () => {
     await loginPage.login(VALID_CREDENTIALS.username, VALID_CREDENTIALS.password);
-
     await loginPage.expectLoginSuccess();
   });
 
-  test('should show error message with invalid credentials', async ({ page }) => {
-    const loginPage = new LoginPage(page);
-
+  test('should show error message with invalid credentials', async () => {
     await loginPage.login(INVALID_CREDENTIALS.username, INVALID_CREDENTIALS.password);
-
     await loginPage.expectLoginError();
   });
 
-  test('should logout successfully after a valid login', async ({ page }) => {
-    const loginPage = new LoginPage(page);
-
+  test('should logout successfully after a valid login', async () => {
     await loginPage.login(VALID_CREDENTIALS.username, VALID_CREDENTIALS.password);
     await loginPage.expectLoginSuccess();
-
     await loginPage.logout();
-
     await loginPage.expectLogoutSuccess();
   });
 });

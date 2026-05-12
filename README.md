@@ -5,6 +5,7 @@ End-to-end UI tests built with Playwright and JavaScript, covering four scenario
 ---
 
 ## Project Structure
+
 ```
 .github/workflows/playwright.yml   CI workflow (GitHub Actions)
 fixtures/auth.js                    Custom Playwright fixture for authenticated tests
@@ -36,6 +37,59 @@ Verify Node: `node --version`
 
 ## Setup
 
+### Installation
+
+#### Option 1 — npm (command line)
+
+**Step 1.** Open a new folder in VS Code or your editor of choice.
+
+**Step 2.** Initialise Playwright:
+
+```bash
+npm init playwright@latest
+```
+
+**Step 3.** The following files will be created:
+
+- `package.json` — Node project management file
+- `playwright.config.js` — Playwright configuration file
+- `tests/` — basic example test
+- `tests-examples/` — detailed example tests
+- `.gitignore` — used during git commit and push
+- `playwright.yml` — used for CI/CD pipelines (GitHub workflows)
+
+**Step 4.** Confirm Playwright is installed:
+
+```bash
+npx playwright -v
+```
+
+**Step 5.** View all available commands:
+
+```bash
+npx playwright -h
+```
+
+> If you cloned this repository instead of starting fresh, run `npm install` then
+> `npx playwright install` to fetch dependencies and browser binaries.
+
+---
+
+#### Option 2 — VS Code Extension
+
+**Step 1.** Create a new folder and open it in VS Code.
+
+**Step 2.** Open the Extensions panel with `Ctrl+Shift+X` (Windows) or `Cmd+Shift+X` (Mac),
+search for **Playwright Test for VSCode** by Microsoft, and install it.
+
+**Step 3.** Open the Command Palette with `Ctrl+Shift+P` (Windows) or `Cmd+Shift+P` (Mac),
+type `playwright`, and select **Install Playwright**.
+
+**Step 4.** Select your browsers and click **OK**. The extension installs libraries and creates
+the project folders.
+
+---
+
 ### 1. Clone and install dependencies
 
 ```bash
@@ -54,6 +108,7 @@ cp .env.example .env
 ```
 
 Then edit `.env`:
+
 ```
 TEST_USERNAME=tomsmith
 TEST_PASSWORD=SuperSecretPassword!
@@ -74,20 +129,20 @@ All tests should pass across Chromium, Firefox, and WebKit.
 
 ## npm Scripts
 
-| Command | What it does |
-|---------|--------------|
-| `npm test` | Run the full suite |
-| `npm run test:headed` | Run with visible browser windows |
-| `npm run test:ui` | Interactive UI mode with time-travel debugging |
-| `npm run test:chromium` | Run only on Chromium |
-| `npm run test:firefox` | Run only on Firefox |
-| `npm run test:webkit` | Run only on WebKit |
-| `npm run test:debug` | Step through with the Playwright Inspector |
-| `npm run test:report` | Open the HTML report from the last run |
-| `npm run lint` | Run ESLint |
-| `npm run lint:fix` | Run ESLint with auto-fix |
-| `npm run format` | Run Prettier on all files |
-| `npm run format:check` | Verify formatting without changes |
+| Command                 | What it does                                   |
+| ----------------------- | ---------------------------------------------- |
+| `npm test`              | Run the full suite                             |
+| `npm run test:headed`   | Run with visible browser windows               |
+| `npm run test:ui`       | Interactive UI mode with time-travel debugging |
+| `npm run test:chromium` | Run only on Chromium                           |
+| `npm run test:firefox`  | Run only on Firefox                            |
+| `npm run test:webkit`   | Run only on WebKit                             |
+| `npm run test:debug`    | Step through with the Playwright Inspector     |
+| `npm run test:report`   | Open the HTML report from the last run         |
+| `npm run lint`          | Run ESLint                                     |
+| `npm run lint:fix`      | Run ESLint with auto-fix                       |
+| `npm run format`        | Run Prettier on all files                      |
+| `npm run format:check`  | Verify formatting without changes              |
 
 ---
 
@@ -124,6 +179,7 @@ npm run lint && npm run format:check
 ```
 
 Good code quality habits:
+
 - `npm run lint` should return zero errors before committing
 - `npm run format:check` should be clean — run `npm run format` to auto-fix formatting
 - Both checks run automatically in CI, so failing them will block the pull request
@@ -135,6 +191,7 @@ Good code quality habits:
 `.github/workflows/playwright.yml` runs the full suite on every pull request and every push to `main`. It also supports manual triggering via `workflow_dispatch`.
 
 The workflow:
+
 1. Checks out the repo
 2. Installs Node.js 20 and project dependencies (`npm ci`)
 3. Installs Playwright browsers with system dependencies
@@ -142,6 +199,7 @@ The workflow:
 5. Uploads the HTML report as a build artifact (retained for 7 days)
 
 Required GitHub Secrets:
+
 - `TEST_USERNAME`
 - `TEST_PASSWORD`
 - `BASE_URL`
@@ -160,6 +218,7 @@ git push origin feature/short-name
 ```
 
 Commit prefixes used in this repo:
+
 - `feat:` new feature or test
 - `fix:` bug fix
 - `refactor:` no behavior change

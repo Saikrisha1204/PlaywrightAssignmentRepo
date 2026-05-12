@@ -1,6 +1,6 @@
 # DESIGN RESPONSES
 
- 1. Multi-Environment Test Data Strategy
+1.  Multi-Environment Test Data Strategy
 
 Config in layers — defaults in code, overridden by env files, overridden by CI secrets. Same suite runs against any environment by changing one variable.
 
@@ -11,7 +11,7 @@ Per-environment .env files, picked by TEST_ENV:
 .env.dev
 .env.staging
 .env.production
-.env.example   (committed contract)
+.env.example (committed contract)
 
 In playwright.config.js:
 
@@ -19,7 +19,7 @@ const envFile = `.env.${process.env.TEST_ENV || 'dev'}`;
 dotenv.config({ path: envFile });
 
 export default defineConfig({
-  use: { baseURL: process.env.BASE_URL },
+use: { baseURL: process.env.BASE_URL },
 });
 
 Run with: TEST_ENV=staging npm test
@@ -28,7 +28,7 @@ Tests stay isolated and independently executable — config changes, code does n
 
 ### Credentials
 
-- Local: .env.* files (gitignored)
+- Local: .env.\* files (gitignored)
 - CI: GitHub Secrets injected as env vars
 - Production: pulled from a secrets manager (AWS Secrets Manager, Vault)
 
@@ -36,40 +36,40 @@ Tests read uniformly via process.env.
 
 ### Feature flags
 
-- Env-wide flags (ENABLE_NEW_CHECKOUT) live in .env.* files
+- Env-wide flags (ENABLE_NEW_CHECKOUT) live in .env.\* files
 - Per-test toggles set via admin API in a fixture, reset on teardown
 - Tests tag themselves with @legacyCheckout or @newCheckout, fixture skips incompatible flows
 
 ### Seed data
 
 - Read-only lookups: JSON in repo
-- Long-lived seed users (admin, manager): provisioned per environment, referenced by ID in .env.*
+- Long-lived seed users (admin, manager): provisioned per environment, referenced by ID in .env.\*
 - Per-test data: created and torn down by the test via API
 
 ### Trade-off
 
 Per-test API setup is slower than shared seed data, but shared mutable data causes more flakes. Latency is hidden by parallelism.
 
------------------------------------------------------------------------------------------------------
+---
 
- 2. Authentication At Scale
+2.  Authentication At Scale
 
 Current pattern (setup project writes user.json, fixture wraps page) extends to multiple roles via one auth file per role.
 
 ### Multi-role storageState
 
 playwright/.auth/
-  associate.json
-  manager.json
-  admin.json
+associate.json
+manager.json
+admin.json
 
 One setup and test project per role:
 
 { name: 'setup-admin', testMatch: /admin\.setup\.js/ },
 {
-  name: 'admin-tests',
-  use: { storageState: 'playwright/.auth/admin.json' },
-  dependencies: ['setup-admin'],
+name: 'admin-tests',
+use: { storageState: 'playwright/.auth/admin.json' },
+dependencies: ['setup-admin'],
 }
 
 A fixture per role keeps signatures self-documenting:
@@ -92,7 +92,8 @@ test('manager voids a transaction', async ({ managerPage }) => { ... });
 
 I wouldn't add worker-scoped login optimization unless login is genuinely slow. A 2-second login isn't worth the complexity.
 
------------------------------------------------------------------------------------------------------
+---
+
 3. Flaky Test Diagnosis And Policy
 
 ### Investigation
@@ -124,9 +125,9 @@ Retries are wrong when they hide an app bug, or when more than ~5% of tests retr
 
 A test passing only after retry should warn, not silently go green.
 
------------------------------------------------------------------------------------------------------
+---
 
- 4. Page Object Model Trade-offs
+4.  Page Object Model Trade-offs
 
 POM works when selectors and actions get reused. LoginPage in this repo earns it — three files use it (login.spec.js, auth.setup.js, fixtures/auth.js) and share the same flow.
 
@@ -148,7 +149,7 @@ POM works when selectors and actions get reused. LoginPage in this repo earns it
 
 POM when selectors are reused across more than one test, or when actions span multiple steps a future reader shouldn't re-derive. Otherwise, inline.
 
------------------------------------------------------------------------------------------------------
+---
 
 5. Test Pyramid For An OMS-Style System
 
@@ -157,6 +158,7 @@ Push tests as low in the pyramid as possible. UI tests are expensive — save th
 ### Unit tests
 
 Pure logic, no external dependencies:
+
 - Tax calculation, discount stacking, currency conversion
 - Order state transitions
 - Validation rules, formatting
@@ -166,6 +168,7 @@ Milliseconds, never flakes.
 ### API integration tests
 
 Service contracts and data, no browser:
+
 - POST /orders persists and emits events
 - Inventory decrements on commit
 - Webhooks fire on status changes
@@ -176,6 +179,7 @@ Most error cases and edge conditions belong here.
 ### Playwright UI tests
 
 Only what needs a browser:
+
 - Critical end-to-end flows (place order, void transaction)
 - Cross-page interactions where state survives navigation
 - JS-heavy interactions (drag-to-reorder)
@@ -197,7 +201,7 @@ Each behavior lives in one layer; others trust it.
 
 A UI test costs ~100x more than a unit test. Lower-layer wins when possible.
 
------------------------------------------------------------------------------------------------------
+---
 
 6. Scaling Beyond 50 Tests
 
@@ -212,8 +216,9 @@ A UI test costs ~100x more than a unit test. Lower-layer wins when possible.
 CI wall-clock becomes the bottleneck. Sharding:
 
 strategy:
-  matrix:
-    shard: [1/4, 2/4, 3/4, 4/4]
+matrix:
+shard: [1/4, 2/4, 3/4, 4/4]
+
 - run: npx playwright test --shard=${{ matrix.shard }}
 
 ~75% wall-clock reduction.

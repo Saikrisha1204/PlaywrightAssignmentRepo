@@ -2,7 +2,7 @@
 
 End-to-end UI tests built with Playwright and JavaScript, covering four scenarios on the-internet.herokuapp.com: login, checkboxes, dropdowns, and dynamic loading. Tests run in parallel across Chromium, Firefox, and WebKit.
 
------------------------------------------------------------------------------------------------------
+---
 
 ## Project Structure
 ```
@@ -23,7 +23,7 @@ playwright.config.js                Browsers, projects, timeouts, reporters
 package.json                        npm scripts and dependencies
 ```
 
------------------------------------------------------------------------------------------------------
+---
 
 ## Requirements
 
@@ -32,7 +32,7 @@ package.json                        npm scripts and dependencies
 
 Verify Node: `node --version`
 
------------------------------------------------------------------------------------------------------
+---
 
 ## Setup
 
@@ -55,13 +55,10 @@ cp .env.example .env
 
 Then edit `.env`:
 ```
-TEST_USERNAME=your_username
-TEST_PASSWORD=your_password
+TEST_USERNAME=tomsmith
+TEST_PASSWORD=SuperSecretPassword!
 BASE_URL=https://the-internet.herokuapp.com
 ```
-
- **Note:** `tomsmith` / `SuperSecretPassword!` are the demo credentials for this public test site,
-but avoid putting real values in the README. The actual credentials belong in `.env` only.
 
 `.env` is gitignored — secrets never leave your machine. In CI, the same variables come from GitHub Secrets.
 
@@ -120,7 +117,16 @@ The fixture also includes a defensive fallback: if the saved session is rejected
 
 ### Code quality
 
-ESLint and Prettier are configured with sensible defaults. `npm run lint` should be green and `npm run format:check` clean before committing.
+ESLint and Prettier are configured with sensible defaults. Running both before every commit ensures consistent style and catches issues early:
+
+```bash
+npm run lint && npm run format:check
+```
+
+Good code quality habits:
+- `npm run lint` should return zero errors before committing
+- `npm run format:check` should be clean — run `npm run format` to auto-fix formatting
+- Both checks run automatically in CI, so failing them will block the pull request
 
 ---
 

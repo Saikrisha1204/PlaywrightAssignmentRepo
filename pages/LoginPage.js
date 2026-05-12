@@ -13,7 +13,6 @@ export class LoginPage {
     this.page = page;
   }
 
-  
   // LOCATORS — Defined once, used everywhere
   get pageHeading() {
     return this.page.getByRole('heading', { name: 'Login Page' });
@@ -43,7 +42,6 @@ export class LoginPage {
     return this.page.getByRole('heading', { name: 'Secure Area', exact: true });
   }
 
-  
   // ACTIONS — User behaviors
   async goto() {
     await this.page.goto('/login');
@@ -59,7 +57,6 @@ export class LoginPage {
   async logout() {
     await this.logoutLink.click();
   }
-
 
   // ASSERTIONS — Page-specific verifications
   async expectLoginSuccess() {

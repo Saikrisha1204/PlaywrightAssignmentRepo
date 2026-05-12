@@ -2,136 +2,204 @@
 
 End-to-end UI tests built with Playwright and JavaScript, covering four scenarios on the-internet.herokuapp.com: login, checkboxes, dropdowns, and dynamic loading. Tests run in parallel across Chromium, Firefox, and WebKit.
 
----
+-----------------------------------------------------------------------------------------------------
 
 ## Project Structure
+```
+.github/workflows/playwright.yml   CI workflow (GitHub Actions)
+fixtures/auth.js                    Custom Playwright fixture for authenticated tests
+pages/LoginPage.js                  Page Object Model for the login page
+tests/
+  auth.setup.js                     One-time login that writes storageState
+  authenticated.spec.js             Tests that start in a logged-in state
+  login.spec.js                     Login flow (valid + invalid + logout)
+  checkbox.spec.js                  Checkbox toggling
+  dropdown.spec.js                  Dropdown selection
+  dynamic_loading.spec.js           Dynamic content loading (parameterized)
+.env.example                        Template for required environment variables
+.eslintrc / eslint.config.js        Linting configuration
+.prettierrc.json                    Formatting configuration
+playwright.config.js                Browsers, projects, timeouts, reporters
+package.json                        npm scripts and dependencies
+```
 
-- tests/login.spec.js — Login flow (valid + invalid)
-- tests/checkbox.spec.js — Checkbox toggling
-- tests/dropdown.spec.js — Dropdown selection
-- tests/dynamic-loading.spec.js — Dynamic content loading
-- playwright.config.js — Browsers, timeouts, reporters
-- package.json
-- package-lock.json
-- .gitignore
-- README.md
-
----
+-----------------------------------------------------------------------------------------------------
 
 ## Requirements
 
 - Node.js v18 or higher (https://nodejs.org/)
 - Windows 10/11, macOS 12+, or Linux (Ubuntu 20.04+)
 
-Verify your Node install: **node --version**
+Verify Node: `node --version`
+
+-----------------------------------------------------------------------------------------------------
+
+## Setup
+
+### 1. Clone and install dependencies
+
+```bash
+git clone https://github.com/Saikrisha1204/PlaywrightAssignmentRepo.git
+cd PlaywrightAssignmentRepo
+npm install
+npx playwright install
+```
+
+### 2. Create your local `.env` file
+
+The repo includes `.env.example` as a template. Copy it and fill in real values:
+
+```bash
+cp .env.example .env
+```
+
+Then edit `.env`:
+```
+TEST_USERNAME=your_username
+TEST_PASSWORD=your_password
+BASE_URL=https://the-internet.herokuapp.com
+```
+
+ **Note:** `tomsmith` / `SuperSecretPassword!` are the demo credentials for this public test site,
+but avoid putting real values in the README. The actual credentials belong in `.env` only.
+
+`.env` is gitignored — secrets never leave your machine. In CI, the same variables come from GitHub Secrets.
+
+### 3. Verify the install
+
+```bash
+npm test
+```
+
+All tests should pass across Chromium, Firefox, and WebKit.
 
 ---
 
-## Installation
+## npm Scripts
 
-### Option 1 — npm (command line)
-
-Step 1. Open a new folder in VS Code or your editor of choice.
-
-Step 2. Initialise Playwright: **npm init playwright@latest**
-
-Step 3. The following files will be created:
-
-- **package.json** — Node project management file
-- **playwright.config.js** — Playwright configuration file
-- **tests/** — basic example test
-- **tests-examples/** — detailed example tests
-- **.gitignore** — used during git commit and push
-- **playwright.yml** — used for CI/CD pipelines (GitHub workflows)
-
-Step 4. Confirm Playwright is installed: **npx playwright -v**
-
-Step 5. View all available commands: **npx playwright -h**
-
-If you cloned this repository instead of starting fresh, run **npm install** then **npx playwright install** to fetch dependencies and browser binaries.
-
-### Option 2 — VS Code Extension
-
-Step 1. Create a new folder and open it in VS Code.
-
-Step 2. Open the Extensions panel with **Ctrl+Shift+X** (Windows) or **Cmd+Shift+X** (Mac), search for "Playwright Test for VSCode" by Microsoft, and install it.
-
-Step 3. Open the Command Palette with **Ctrl+Shift+P** (Windows) or **Cmd+Shift+P** (Mac), type playwright, and select Install Playwright.
-
-Step 4. Select your browsers and click OK. The extension installs libraries and creates the project folders.
+| Command | What it does |
+|---------|--------------|
+| `npm test` | Run the full suite |
+| `npm run test:headed` | Run with visible browser windows |
+| `npm run test:ui` | Interactive UI mode with time-travel debugging |
+| `npm run test:chromium` | Run only on Chromium |
+| `npm run test:firefox` | Run only on Firefox |
+| `npm run test:webkit` | Run only on WebKit |
+| `npm run test:debug` | Step through with the Playwright Inspector |
+| `npm run test:report` | Open the HTML report from the last run |
+| `npm run lint` | Run ESLint |
+| `npm run lint:fix` | Run ESLint with auto-fix |
+| `npm run format` | Run Prettier on all files |
+| `npm run format:check` | Verify formatting without changes |
 
 ---
 
-## Running Tests
+## Architecture
 
-- Run all tests across all browsers: **npx playwright test**
-- Run with visible browser windows: **npx playwright test --headed**
-- Interactive mode with time-travel debugging: **npx playwright test --ui**
-- Run on a single browser: **npx playwright test --project=chromium**
-- Run a specific spec file: **npx playwright test tests/login.spec.js**
-- Step through with the Playwright Inspector: **npx playwright test --debug**
-- Open the HTML report after a run: **npx playwright show-report**
+### Page Object Model
+
+`pages/LoginPage.js` encapsulates the login page's selectors, actions, and assertions in one class. Three different files use it — `tests/login.spec.js`, `tests/auth.setup.js`, and `fixtures/auth.js` — so a single change to the page object propagates everywhere.
+
+### Authentication via storageState
+
+`tests/auth.setup.js` is a setup project that runs once at the start of each test run. It performs login and saves the resulting cookies and localStorage to `playwright/.auth/user.json`. Browser projects then load this state via `storageState` in their `use` block, so tests start in an already-authenticated context.
+
+`fixtures/auth.js` wraps this with an `authenticatedPage` fixture for self-documenting test signatures:
+
+```javascript
+test('access secure area', async ({ authenticatedPage: page }) => {
+  // page is already authenticated
+});
+```
+
+The fixture also includes a defensive fallback: if the saved session is rejected (the demo site's Rack server occasionally invalidates cross-context sessions), it re-authenticates and refreshes the state.
+
+### Configuration
+
+`playwright.config.js` reads `BASE_URL`, `TEST_USERNAME`, and `TEST_PASSWORD` from environment via dotenv. All tests use relative paths (`/login`, `/checkboxes`) so swapping environments only requires changing `BASE_URL`.
+
+### Code quality
+
+ESLint and Prettier are configured with sensible defaults. `npm run lint` should be green and `npm run format:check` clean before committing.
 
 ---
 
-## Git Setup & Workflow
+## Continuous Integration
 
-Clone the repository: **git clone https://github.com/your-username/PlaywrightAssignmentRepo.git** then **cd playwright-assignment**
+`.github/workflows/playwright.yml` runs the full suite on every pull request and every push to `main`. It also supports manual triggering via `workflow_dispatch`.
 
-Keep your fork up to date: **git checkout main** then **git pull origin main**
+The workflow:
+1. Checks out the repo
+2. Installs Node.js 20 and project dependencies (`npm ci`)
+3. Installs Playwright browsers with system dependencies
+4. Runs `npm test` with credentials from GitHub Secrets
+5. Uploads the HTML report as a build artifact (retained for 7 days)
 
-Create a feature branch: **git checkout -b feature/short-name**
+Required GitHub Secrets:
+- `TEST_USERNAME`
+- `TEST_PASSWORD`
+- `BASE_URL`
 
-Stage and commit your changes: **git add .** then **git commit -m "feat: description of what the test covers"**
+---
 
-Push and raise a pull request: **git push origin feature/short-name** then open a pull request on GitHub from your branch into main.
+## Git Workflow
 
-Recommended commit message prefixes — **feat:** for new tests or features, **fix:** for bug fixes, **refactor:** for changes with no behaviour difference, **docs:** for README or comment updates, **chore:** for config or dependency changes.
+```bash
+git checkout -b feature/short-name
+# make changes
+git add .
+git commit -m "feat: description of the change"
+git push origin feature/short-name
+# open a pull request on GitHub
+```
+
+Commit prefixes used in this repo:
+- `feat:` new feature or test
+- `fix:` bug fix
+- `refactor:` no behavior change
+- `docs:` documentation only
+- `style:` formatting only
+- `chore:` tooling, dependencies, build
+- `ci:` CI/CD configuration
+- `test:` test additions or changes
 
 ---
 
 ## Design Decisions
 
-Selectors. Tests follow Playwright's recommended hierarchy: role-based locators (**getByRole**) first, stable IDs second, CSS pseudo-classes (**option:checked**) for state. Fragile selectors such as deep CSS chains and XPath are avoided.
+**Selectors.** Role-based locators (`getByRole`) first, stable IDs second, CSS state pseudo-classes (`option:checked`) where needed. Fragile selectors like deep CSS chains and XPath are avoided.
 
-Assertions. Each test verifies outcomes from multiple independent angles. A successful login is confirmed by the URL change, the success message, the logout link, and the secure-area heading. Negative assertions (**toBeHidden**, **not.toBeChecked**) are used where they apply.
+**Assertions.** Each test verifies outcomes from multiple angles. A successful login is confirmed by URL, success message, logout link, and secure-area heading.
 
-Waits. No **waitForTimeout** or manual sleeps. All waits rely on Playwright's auto-retrying web-first assertions. The single explicit timeout for the dynamic loader is a named constant.
+**Waits.** No `waitForTimeout` or manual sleeps. All waits rely on Playwright's auto-retrying web-first assertions. The one explicit timeout (dynamic loader) is a named constant.
 
-Test independence. Every test runs in a fresh browser context with no shared state, so the suite is safe to run in parallel.
+**Test independence.** Every test runs in a fresh browser context with no shared state — safe for parallel execution.
 
-Test data. URLs, credentials, and expected messages are defined as constants at the top of each spec file.
-
----
-
-## Contributing
-
-1. Create a feature branch: **git checkout -b feature/short-name**
-2. Add your test in **tests/** as **feature.spec.js**, following the existing patterns — constants at top, role-based locators, multi-angle assertions.
-3. Run the full suite locally: **npx playwright test**
-4. Open a pull request describing the change and what it verifies.
-
-For bug reports, include the failing command, the browser, and the trace from **npx playwright show-report**.
+**Test data.** URLs and base config come from `.env`. Test fixtures (invalid credentials, expected messages) live as constants at the top of each spec.
 
 ---
 
 ## Troubleshooting
 
-Browsers fail to download. Run **npx playwright install --with-deps**. The flag installs OS-level dependencies on Linux.
+**Browsers fail to download.** Run `npx playwright install --with-deps`. The flag installs OS-level dependencies on Linux.
 
-"No tests found". Run from the project root where **package.json** lives. Test files must be in **tests/** and end in **.spec.js**.
+**Tests fail with "username is undefined".** Check that `.env` exists and contains `TEST_USERNAME` and `TEST_PASSWORD`. Run `cat .env` to verify.
 
-Tests run slowly. Limit workers with **npx playwright test --workers=2**, or target a single browser with **npx playwright test --project=chromium**.
+**"No tests found".** Run from the project root where `package.json` lives. Test files must be in `tests/` and end in `.spec.js`.
+
+**Tests run slowly.** Limit workers with `npx playwright test --workers=2`, or target a single browser with `npm run test:chromium`.
+
+**Auth state issues.** Delete `playwright/.auth/user.json` and re-run `npm test`. The setup project will regenerate it.
 
 ---
 
 ## Known Limitations
 
-Third-party test target. All tests run against the-internet.herokuapp.com, a publicly hosted demo site not maintained by this project. Occasional downtime on that server can cause failures unrelated to the test code. If a run fails unexpectedly, confirm the site is reachable before investigating.
+**Third-party test target.** Tests run against the-internet.herokuapp.com, a public demo site not maintained by this project. Occasional downtime can cause failures unrelated to the test code.
 
-Credentials in source. Login credentials are plain-text constants inside the spec files. This is acceptable for a public demo site but should be replaced with environment variables using a **.env** file and **dotenv** before testing any real application.
+**Demo site session quirk.** The site's Rack-based server occasionally rejects sessions across browser contexts. The auth fixture handles this with a transparent re-authentication fallback. In a production app with standard cookie/JWT auth, this fallback would never trigger.
 
-Parallel workers in CI. Running all three browsers in parallel can be resource-intensive on free-tier CI runners. If you see timeouts, reduce parallelism with **--workers=2** or run a single browser with **--project=chromium**.
+**Parallel workers on free-tier CI.** Running three browsers in parallel can be resource-intensive on small runners. The config opts down to a single worker on CI (`workers: process.env.CI ? 1 : undefined`) to avoid timeouts.
 
 ---
 
@@ -139,3 +207,4 @@ Parallel workers in CI. Running all three browsers in parallel can be resource-i
 
 - Playwright documentation: https://playwright.dev/
 - Test target: https://the-internet.herokuapp.com/
+- Design notes for this repo: see DESIGN.md
